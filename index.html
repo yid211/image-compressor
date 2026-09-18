@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>かんたん画像圧縮ツール</title>
+<style>
+body {
+    font-family: sans-serif;
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+}
+h1 { text-align: center; }
+.box {
+    border: 2px dashed #aaa;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    margin: 25px 0;
+}
+input, button {
+    font-size: 16px;
+    padding: 10px 14px;
+    margin: 6px;
+}
+button {
+    cursor: pointer;
+}
+#result {
+    margin-top: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>かんたん画像圧縮ツール</h1>
+
+<p>
+画像を選ぶだけで、ブラウザ上で画像を圧縮できます。
+画像はサーバーにアップロードされません。
+</p>
+
+<div class="box">
+    <input type="file" id="file" accept="image/*">
+    <br>
+    <label>
+        圧縮品質：
+        <input type="range" id="quality" min="10" max="100" value="70">
+        <span id="qualityValue">70</span>%
+    </label>
+    <br>
+    <button id="compress">画像を圧縮する</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+const fileInput = document.getElementById("file");
+const qualityInput = document.getElementById("quality");
+const qualityValue = document.getElementById("qualityValue");
+const result = document.getElementById("result");
+
+qualityInput.addEventListener("input", () => {
+    qualityValue.textContent = qualityInput.value;
+});
+
+document.getElementById("compress").addEventListener("click", () => {
+    const file = fileInput.files[0];
+
+    if (!file) {
+        result.innerHTML = "<p>まず画像を選んでください。</p>";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const img = new Image();
+
+        img.onload = function() {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const originalKB = (file.size / 1024).toFixed(1);
+                const compressedKB = (blob.size / 1024).toFixed(1);
+                const reduction = ((1 - blob.size / file.size) * 100).toFixed(1);
+
+                result.innerHTML = `
+                    <h2>圧縮完了</h2>
+                    <p>元のサイズ：${originalKB} KB</p>
+                    <p>圧縮後：${compressedKB} KB</p>
+                    <p>削減率：${reduction}%</p>
+                    <a href="${url}" download="compressed-image.jpg">
+                        <button>圧縮画像を保存</button>
+                    </a>
+                `;
+            }, "image/jpeg", qualityInput.value / 100);
+        };
+
+        img.src = e.target.result;
+    };
+
+    reader.readAsDataURL(file);
+});
+</script>
+
+</body>
+</html>
