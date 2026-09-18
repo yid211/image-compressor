@@ -4,17 +4,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>かんたん画像圧縮・縮小ツール</title>
-<meta name="description" content="画像をかんたんに圧縮・縮小できる無料ツール。画像はサーバーにアップロードされません。">
+<title>無料画像圧縮・サイズ変更ツール｜ブラウザで簡単</title>
+<meta name="description" content="無料で使える画像圧縮・サイズ変更ツール。JPG・PNG・WebPに対応。画像はブラウザ上で処理され、サーバーにアップロードされません。">
+
 <style>
 body {
     font-family: sans-serif;
     max-width: 700px;
     margin: 40px auto;
     padding: 20px;
-    line-height: 1.6;
+    line-height: 1.7;
 }
-h1 { text-align: center; }
+h1 {
+    text-align: center;
+}
+h2 {
+    margin-top: 35px;
+}
 .box {
     border: 2px dashed #aaa;
     border-radius: 12px;
@@ -39,24 +45,31 @@ button {
 }
 #result {
     margin-top: 25px;
+    padding: 15px;
+    border-radius: 10px;
+}
+.info {
+    padding: 15px;
+    background: #f5f5f5;
+    border-radius: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>かんたん画像圧縮・縮小ツール</h1>
+<h1>無料画像圧縮・サイズ変更ツール</h1>
 
 <p>
-画像を選ぶだけで、ブラウザ上で画像を圧縮・縮小できます。
-選択した画像はサーバーにアップロードされません。
+画像をブラウザ上で圧縮・縮小できる無料ツールです。
+画像はサーバーにアップロードされず、あなたのブラウザ上で処理されます。
 </p>
 
 <div class="box">
 
     <div class="setting">
         <label>
-            画像：
+            <strong>画像：</strong>
             <input type="file" id="file" accept="image/*">
         </label>
     </div>
@@ -79,6 +92,17 @@ button {
 
     <div class="setting">
         <label>
+            出力形式：
+            <select id="format">
+                <option value="jpg">JPG</option>
+                <option value="png">PNG</option>
+                <option value="webp">WebP</option>
+            </select>
+        </label>
+    </div>
+
+    <div class="setting">
+        <label>
             圧縮品質：
             <input type="range" id="quality" min="10" max="100" value="70">
             <span id="qualityValue">70</span>%
@@ -91,7 +115,42 @@ button {
 
 <div id="result"></div>
 
+<div class="info">
+<h2>使い方</h2>
+<ol>
+<li>画像を選択します。</li>
+<li>必要なら最大幅・最大高さを入力します。</li>
+<li>圧縮品質を設定します。</li>
+<li>「画像を圧縮・縮小する」を押します。</li>
+<li>完成した画像を保存します。</li>
+</ol>
+</div>
+
+<h2>特徴</h2>
+
+<ul>
+<li>無料で利用できます。</li>
+<li>ブラウザ上で画像を処理します。</li>
+<li>画像をサーバーへアップロードしません。</li>
+<li>画像の圧縮とサイズ変更ができます。</li>
+</ul>
+
+<h2>よくある質問</h2>
+
+<h3>画像はサーバーに送信されますか？</h3>
+<p>
+このツールでは画像の処理をブラウザ上で行います。
+画像ファイルをこのサイトのサーバーへアップロードする処理は行っていません。
+</p>
+
+<h3>どの形式に対応していますか？</h3>
+<p>
+ブラウザが読み込める画像形式に対応しています。
+出力形式はJPG・PNG・WebPから選択できます。
+</p>
+
 <script>
+
 const fileInput = document.getElementById("file");
 const qualityInput = document.getElementById("quality");
 const qualityValue = document.getElementById("qualityValue");
@@ -106,12 +165,17 @@ document.getElementById("compress").addEventListener("click", () => {
     const file = fileInput.files[0];
 
     if (!file) {
-        result.innerHTML = "<p>まず画像を選んでください。</p>";
+        result.innerHTML = "<p>まず画像を選択してください。</p>";
         return;
     }
 
-    const maxWidth = parseInt(document.getElementById("maxWidth").value);
-    const maxHeight = parseInt(document.getElementById("maxHeight").value);
+    const maxWidth = parseInt(
+        document.getElementById("maxWidth").value
+    );
+
+    const maxHeight = parseInt(
+        document.getElementById("maxHeight").value
+    );
 
     const reader = new FileReader();
 
@@ -124,7 +188,6 @@ document.getElementById("compress").addEventListener("click", () => {
             let width = img.width;
             let height = img.height;
 
-            // 最大幅・最大高さに収まるように縮小
             if (maxWidth && width > maxWidth) {
                 height = height * (maxWidth / width);
                 width = maxWidth;
@@ -139,36 +202,66 @@ document.getElementById("compress").addEventListener("click", () => {
             height = Math.round(height);
 
             const canvas = document.createElement("canvas");
+
             canvas.width = width;
             canvas.height = height;
 
             const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, width, height);
+
+            ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+            );
+
+            // 出力形式を選択
+            const format = document.getElementById("format").value;
+
+            let mimeType;
+            let extension;
+
+            if (format === "png") {
+                mimeType = "image/png";
+                extension = "png";
+            } else if (format === "webp") {
+                mimeType = "image/webp";
+                extension = "webp";
+            } else {
+                mimeType = "image/jpeg";
+                extension = "jpg";
+            }
 
             canvas.toBlob(function(blob) {
 
                 const url = URL.createObjectURL(blob);
 
-                const originalKB = (file.size / 1024).toFixed(1);
-                const compressedKB = (blob.size / 1024).toFixed(1);
+                const originalKB =
+                    (file.size / 1024).toFixed(1);
 
-                const reduction = Math.max(
-                    0,
-                    (1 - blob.size / file.size) * 100
-                ).toFixed(1);
+                const resultKB =
+                    (blob.size / 1024).toFixed(1);
+
+                const reduction =
+                    Math.max(
+                        0,
+                        (1 - blob.size / file.size) * 100
+                    ).toFixed(1);
 
                 result.innerHTML = `
                     <h2>完成</h2>
                     <p>元のサイズ：${originalKB} KB</p>
-                    <p>変換後：${compressedKB} KB</p>
+                    <p>変換後：${resultKB} KB</p>
                     <p>削減率：${reduction}%</p>
                     <p>画像サイズ：${width} × ${height} px</p>
-                    <a href="${url}" download="compressed-image.jpg">
+
+                    <a href="${url}" download="compressed-image.${extension}">
                         <button>画像を保存</button>
                     </a>
                 `;
 
-            }, "image/jpeg", qualityInput.value / 100);
+            }, mimeType, qualityInput.value / 100);
         };
 
         img.src = e.target.result;
@@ -176,6 +269,7 @@ document.getElementById("compress").addEventListener("click", () => {
 
     reader.readAsDataURL(file);
 });
+
 </script>
 
 </body>
