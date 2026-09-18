@@ -4,7 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>かんたん画像圧縮ツール</title>
+<title>かんたん画像圧縮・縮小ツール</title>
+<meta name="description" content="画像をかんたんに圧縮・縮小できる無料ツール。画像はサーバーにアップロードされません。">
 <style>
 body {
     font-family: sans-serif;
@@ -17,16 +18,23 @@ h1 { text-align: center; }
 .box {
     border: 2px dashed #aaa;
     border-radius: 12px;
-    padding: 40px 20px;
-    text-align: center;
+    padding: 30px 20px;
     margin: 25px 0;
 }
-input, button {
+.setting {
+    margin: 18px 0;
+}
+input[type="number"] {
+    width: 100px;
+    padding: 8px;
     font-size: 16px;
-    padding: 10px 14px;
-    margin: 6px;
+}
+input[type="range"] {
+    width: 200px;
 }
 button {
+    font-size: 16px;
+    padding: 10px 16px;
     cursor: pointer;
 }
 #result {
@@ -37,23 +45,48 @@ button {
 
 <body>
 
-<h1>かんたん画像圧縮ツール</h1>
+<h1>かんたん画像圧縮・縮小ツール</h1>
 
 <p>
-画像を選ぶだけで、ブラウザ上で画像を圧縮できます。
-画像はサーバーにアップロードされません。
+画像を選ぶだけで、ブラウザ上で画像を圧縮・縮小できます。
+選択した画像はサーバーにアップロードされません。
 </p>
 
 <div class="box">
-    <input type="file" id="file" accept="image/*">
-    <br>
-    <label>
-        圧縮品質：
-        <input type="range" id="quality" min="10" max="100" value="70">
-        <span id="qualityValue">70</span>%
-    </label>
-    <br>
-    <button id="compress">画像を圧縮する</button>
+
+    <div class="setting">
+        <label>
+            画像：
+            <input type="file" id="file" accept="image/*">
+        </label>
+    </div>
+
+    <div class="setting">
+        <label>
+            最大幅：
+            <input type="number" id="maxWidth" placeholder="自動" min="1">
+            px
+        </label>
+    </div>
+
+    <div class="setting">
+        <label>
+            最大高さ：
+            <input type="number" id="maxHeight" placeholder="自動" min="1">
+            px
+        </label>
+    </div>
+
+    <div class="setting">
+        <label>
+            圧縮品質：
+            <input type="range" id="quality" min="10" max="100" value="70">
+            <span id="qualityValue">70</span>%
+        </label>
+    </div>
+
+    <button id="compress">画像を圧縮・縮小する</button>
+
 </div>
 
 <div id="result"></div>
@@ -69,6 +102,7 @@ qualityInput.addEventListener("input", () => {
 });
 
 document.getElementById("compress").addEventListener("click", () => {
+
     const file = fileInput.files[0];
 
     if (!file) {
@@ -76,34 +110,64 @@ document.getElementById("compress").addEventListener("click", () => {
         return;
     }
 
+    const maxWidth = parseInt(document.getElementById("maxWidth").value);
+    const maxHeight = parseInt(document.getElementById("maxHeight").value);
+
     const reader = new FileReader();
 
     reader.onload = function(e) {
+
         const img = new Image();
 
         img.onload = function() {
+
+            let width = img.width;
+            let height = img.height;
+
+            // 最大幅・最大高さに収まるように縮小
+            if (maxWidth && width > maxWidth) {
+                height = height * (maxWidth / width);
+                width = maxWidth;
+            }
+
+            if (maxHeight && height > maxHeight) {
+                width = width * (maxHeight / height);
+                height = maxHeight;
+            }
+
+            width = Math.round(width);
+            height = Math.round(height);
+
             const canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
+            canvas.width = width;
+            canvas.height = height;
 
             const ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0);
+            ctx.drawImage(img, 0, 0, width, height);
 
             canvas.toBlob(function(blob) {
+
                 const url = URL.createObjectURL(blob);
+
                 const originalKB = (file.size / 1024).toFixed(1);
                 const compressedKB = (blob.size / 1024).toFixed(1);
-                const reduction = ((1 - blob.size / file.size) * 100).toFixed(1);
+
+                const reduction = Math.max(
+                    0,
+                    (1 - blob.size / file.size) * 100
+                ).toFixed(1);
 
                 result.innerHTML = `
-                    <h2>圧縮完了</h2>
+                    <h2>完成</h2>
                     <p>元のサイズ：${originalKB} KB</p>
-                    <p>圧縮後：${compressedKB} KB</p>
+                    <p>変換後：${compressedKB} KB</p>
                     <p>削減率：${reduction}%</p>
+                    <p>画像サイズ：${width} × ${height} px</p>
                     <a href="${url}" download="compressed-image.jpg">
-                        <button>圧縮画像を保存</button>
+                        <button>画像を保存</button>
                     </a>
                 `;
+
             }, "image/jpeg", qualityInput.value / 100);
         };
 
