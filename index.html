@@ -2,484 +2,358 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>パスポート申請用写真サイズ・容量調整ツール｜600×730px・600KB</title>
+  <title>パスポート申請用写真 サイズ・容量調整ツール｜600×730px・600KB</title>
 
-<meta name="description"
-content="マイナポータルのパスポートオンライン申請用写真を、600×730px・600KB以内のJPGに調整する無料ツール。画像はブラウザ上で処理します。">
+  <meta
+    name="description"
+    content="パスポートのオンライン申請用写真を600×730px・600KB以下のJPGに調整する無料ツール。画像はブラウザ上で処理します。"
+  >
 
-<style>
-body {
-    font-family: sans-serif;
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 25px 18px;
-    line-height: 1.7;
-    color: #222;
-}
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.7;
+      color: #333;
+    }
 
-h1 {
-    line-height: 1.4;
-}
+    h1 {
+      font-size: 26px;
+      line-height: 1.4;
+    }
 
-h2 {
-    margin-top: 35px;
-}
+    .box {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
 
-.box {
-    border: 2px dashed #aaa;
-    border-radius: 12px;
-    padding: 25px;
-    margin: 25px 0;
-}
+    .target {
+      font-size: 20px;
+      font-weight: bold;
+    }
 
-.check {
-    border-radius: 10px;
-    padding: 15px;
-    margin-top: 20px;
-}
+    input {
+      margin: 15px 0;
+    }
 
-.ok {
-    background: #e9f7e9;
-}
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background: #333;
+      color: white;
+    }
 
-.ng {
-    background: #fff0f0;
-}
+    button:disabled {
+      background: #aaa;
+      cursor: default;
+    }
 
-.setting {
-    margin: 18px 0;
-}
+    #result {
+      margin-top: 25px;
+    }
 
-input[type="file"] {
-    max-width: 100%;
-}
+    .success {
+      background: #eef8ee;
+      padding: 15px;
+      border-radius: 8px;
+    }
 
-input[type="range"] {
-    width: 220px;
-}
+    .warning {
+      background: #fff8e5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
 
-button {
-    padding: 11px 18px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 8px;
-}
+    .error {
+      background: #fff0f0;
+      padding: 15px;
+      border-radius: 8px;
+    }
 
-.preview {
-    max-width: 100%;
-    max-height: 450px;
-    display: block;
-    margin: 20px auto;
-}
+    a.download {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 12px 20px;
+      background: #333;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
 
-.notice {
-    background: #f5f5f5;
-    border-radius: 10px;
-    padding: 15px;
-}
-
-.warning {
-    background: #fff8df;
-    border-radius: 10px;
-    padding: 15px;
-}
-</style>
+    small {
+      color: #666;
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>パスポート申請用写真<br>サイズ・容量調整ツール</h1>
+  <h1>パスポート申請用写真<br>サイズ・容量調整ツール</h1>
 
-<p>
-マイナポータルからのパスポートオンライン申請で使用する
-写真データのサイズ・容量を確認、調整できます。
-</p>
+  <p>
+    オンライン申請用の顔写真を、
+    <strong>600×730px・600KB以下のJPG</strong>
+    に調整する無料ツールです。
+  </p>
 
-<div class="notice">
-<strong>このツールで確認する条件</strong>
-<ul>
-<li>形式：JPG</li>
-<li>サイズ：600 × 730 px</li>
-<li>容量：600KB以内</li>
-</ul>
-</div>
+  <div class="box">
+    <div class="target">調整後の目標</div>
+    <ul>
+      <li>画像形式：JPG</li>
+      <li>画像サイズ：600×730px</li>
+      <li>ファイル容量：600KB以下</li>
+    </ul>
 
-<div class="box">
+    <p>
+      ※600KB以下になるよう、画質を自動調整します。
+    </p>
+  </div>
 
-    <h2>1. 写真を選択</h2>
+  <input type="file" id="imageInput" accept="image/*">
 
-    <input type="file" id="file" accept="image/*">
+  <br>
 
-    <div id="original"></div>
+  <button id="convertButton" disabled>写真を調整する</button>
 
-    <img id="preview" class="preview" style="display:none;">
+  <div id="result"></div>
 
-    <h2>2. 変換設定</h2>
+  <div class="warning">
+    <strong>注意</strong><br>
+    このツールは、画像の形式・ピクセルサイズ・ファイル容量を調整するものです。<br>
+    顔の位置、大きさ、背景、撮影時期など、パスポート写真としてのその他の条件を満たしていることを保証するものではありません。申請前に必ず公式の案内をご確認ください。
+  </div>
 
-    <div class="setting">
-        <label>
-            JPG品質：
-            <input
-                type="range"
-                id="quality"
-                min="10"
-                max="100"
-                value="90"
-            >
-            <span id="qualityValue">90</span>%
-        </label>
-    </div>
+  <div class="box">
+    <strong>プライバシーについて</strong><br>
+    選択した画像は、このページを開いているブラウザ上で処理されます。
+    サーバーへ画像をアップロードする処理は行っていません。
+  </div>
 
-    <button id="convert">
-        600×730px・600KB以内のJPGを作成
-    </button>
+  <p>
+    <small>
+      ※実際の申請条件については、最新の公式案内をご確認ください。
+    </small>
+  </p>
 
-</div>
+  <script>
+    const TARGET_WIDTH = 600;
+    const TARGET_HEIGHT = 730;
+    const MAX_BYTES = 600 * 1024;
 
-<div id="result"></div>
+    const imageInput = document.getElementById("imageInput");
+    const convertButton = document.getElementById("convertButton");
+    const result = document.getElementById("result");
 
-<div class="warning">
-<strong>重要</strong>
-<p>
-このツールは画像のファイル形式、ピクセルサイズ、ファイル容量を
-調整・確認するものです。
-</p>
+    let selectedFile = null;
 
-<p>
-顔の位置、大きさ、背景、明るさ、撮影時期、本人確認上の要件など、
-パスポート写真としての適合性を保証するものではありません。
-最終的には必ずマイナポータル・外務省の公式案内を確認してください。
-</p>
-</div>
+    imageInput.addEventListener("change", () => {
+      selectedFile = imageInput.files[0];
 
-<h2>使い方</h2>
+      result.innerHTML = "";
 
-<ol>
-<li>写真を選択します。</li>
-<li>元の写真の規格を確認します。</li>
-<li>「600×730px・600KB以内のJPGを作成」を押します。</li>
-<li>変換された画像の結果を確認します。</li>
-<li>問題がなければ保存します。</li>
-</ol>
-
-<h2>公式情報</h2>
-
-<p>
-パスポートのオンライン申請では、写真館等で撮影した顔写真データを
-アップロードできます。
-</p>
-
-<script>
-
-const fileInput = document.getElementById("file");
-const qualityInput = document.getElementById("quality");
-const qualityValue = document.getElementById("qualityValue");
-
-const original = document.getElementById("original");
-const preview = document.getElementById("preview");
-const result = document.getElementById("result");
-
-const TARGET_WIDTH = 600;
-const TARGET_HEIGHT = 730;
-const MAX_BYTES = 600 * 1024;
-
-qualityInput.addEventListener("input", () => {
-    qualityValue.textContent = qualityInput.value;
-});
-
-fileInput.addEventListener("change", () => {
-
-    const file = fileInput.files[0];
-
-    if (!file) {
+      if (!selectedFile) {
+        convertButton.disabled = true;
         return;
-    }
+      }
 
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-
-        const img = new Image();
-
-        img.onload = function() {
-
-            let messages = [];
-
-            const isJpg =
-                file.type === "image/jpeg" ||
-                file.type === "image/jpg";
-
-            if (isJpg) {
-                messages.push("形式：JPG ✓");
-            } else {
-                messages.push(
-                    "形式：" +
-                    (file.type || "不明") +
-                    " → 変換が必要"
-                );
-            }
-
-            if (
-                img.width === TARGET_WIDTH &&
-                img.height === TARGET_HEIGHT
-            ) {
-                messages.push("サイズ：600 × 730 px ✓");
-            } else {
-                messages.push(
-                    "サイズ：" +
-                    img.width +
-                    " × " +
-                    img.height +
-                    " px → 変換が必要"
-                );
-            }
-
-            if (file.size <= MAX_BYTES) {
-                messages.push(
-                    "容量：" +
-                    (file.size / 1024).toFixed(1) +
-                    " KB ✓"
-                );
-            } else {
-                messages.push(
-                    "容量：" +
-                    (file.size / 1024).toFixed(1) +
-                    " KB → 600KB以下への圧縮が必要"
-                );
-            }
-
-            original.innerHTML = `
-                <div class="check">
-                    <h3>元の画像</h3>
-                    <p>${messages.join("<br>")}</p>
-                </div>
-            `;
-
-            preview.src = e.target.result;
-            preview.style.display = "block";
-        };
-
-        img.src = e.target.result;
-    };
-
-    reader.readAsDataURL(file);
-});
-
-
-document.getElementById("convert").addEventListener("click", () => {
-
-    const file = fileInput.files[0];
-
-    if (!file) {
-        result.innerHTML =
-            '<div class="check ng">先に写真を選択してください。</div>';
+      if (!selectedFile.type.startsWith("image/")) {
+        result.innerHTML = `
+          <div class="error">
+            画像ファイルを選択してください。
+          </div>
+        `;
+        convertButton.disabled = true;
         return;
-    }
+      }
 
-    const reader = new FileReader();
+      result.innerHTML = `
+        <div class="box">
+          <strong>選択した画像</strong><br>
+          ファイル名：${escapeHtml(selectedFile.name)}<br>
+          元の容量：${formatBytes(selectedFile.size)}
+        </div>
+      `;
 
-    reader.onload = function(e) {
+      convertButton.disabled = false;
+    });
 
-        const img = new Image();
+    convertButton.addEventListener("click", () => {
+      if (!selectedFile) return;
 
-        img.onload = function() {
+      convertButton.disabled = true;
+      convertButton.textContent = "調整中...";
 
-            /*
-             * 600×730のキャンバスを作る。
-             *
-             * 元画像と600×730の縦横比が違う場合、
-             * 中央部分を切り抜いて600×730にする。
-             *
-             * 顔写真の場合は顔の位置がずれる可能性があるため、
-             * 変換後の画像を必ず本人が確認する。
-             */
+      result.innerHTML = `
+        <div class="box">
+          写真を600×730pxに調整しています...
+        </div>
+      `;
 
-            const canvas = document.createElement("canvas");
+      const img = new Image();
 
-            canvas.width = TARGET_WIDTH;
-            canvas.height = TARGET_HEIGHT;
+      img.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
 
-            const ctx = canvas.getContext("2d");
+          canvas.width = TARGET_WIDTH;
+          canvas.height = TARGET_HEIGHT;
 
-            const targetRatio =
-                TARGET_WIDTH / TARGET_HEIGHT;
+          const ctx = canvas.getContext("2d");
 
-            const sourceRatio =
-                img.width / img.height;
+          /*
+            600×730の比率に合わせて中央を切り抜く。
+            元画像の縦横比によっては上下または左右が切り取られる。
+          */
 
-            let sx = 0;
-            let sy = 0;
-            let sw = img.width;
-            let sh = img.height;
+          const targetRatio = TARGET_WIDTH / TARGET_HEIGHT;
+          const sourceRatio = img.width / img.height;
 
-            if (sourceRatio > targetRatio) {
+          let sx = 0;
+          let sy = 0;
+          let sw = img.width;
+          let sh = img.height;
 
-                // 横長 → 左右を切る
-                sw = img.height * targetRatio;
-                sx = (img.width - sw) / 2;
+          if (sourceRatio > targetRatio) {
+            sw = img.height * targetRatio;
+            sx = (img.width - sw) / 2;
+          } else {
+            sh = img.width / targetRatio;
+            sy = (img.height - sh) / 2;
+          }
 
-            } else if (sourceRatio < targetRatio) {
+          ctx.drawImage(
+            img,
+            sx,
+            sy,
+            sw,
+            sh,
+            0,
+            0,
+            TARGET_WIDTH,
+            TARGET_HEIGHT
+          );
 
-                // 縦長 → 上下を切る
-                sh = img.width / targetRatio;
-                sy = (img.height - sh) / 2;
-            }
+          /*
+            JPEG品質を高い状態から少しずつ下げ、
+            600KB以下になるまで自動調整する。
+          */
 
-            ctx.drawImage(
-                img,
-                sx,
-                sy,
-                sw,
-                sh,
-                0,
-                0,
-                TARGET_WIDTH,
-                TARGET_HEIGHT
+          let quality = 0.95;
+          let blob = null;
+
+          const tryConvert = () => {
+            canvas.toBlob(
+              (newBlob) => {
+                if (!newBlob) {
+                  showError("画像の変換に失敗しました。");
+                  return;
+                }
+
+                blob = newBlob;
+
+                if (blob.size <= MAX_BYTES) {
+                  showSuccess(blob);
+                  return;
+                }
+
+                quality -= 0.05;
+
+                if (quality < 0.10) {
+                  showError(
+                    "600KB以下に調整できませんでした。別の画像でお試しください。"
+                  );
+                  return;
+                }
+
+                tryConvert();
+              },
+              "image/jpeg",
+              quality
             );
+          };
 
+          tryConvert();
 
-            /*
-             * まず指定品質でJPG化。
-             * 600KBを超える場合は品質を自動的に下げる。
-             */
+        } catch (error) {
+          showError("画像の処理中にエラーが発生しました。");
+        }
+      };
 
-            let quality =
-                parseInt(qualityInput.value) / 100;
+      img.onerror = () => {
+        showError("画像を読み込めませんでした。");
+      };
 
-            function makeBlob(q) {
+      img.src = URL.createObjectURL(selectedFile);
+    });
 
-                return new Promise(resolve => {
+    function showSuccess(blob) {
+      const url = URL.createObjectURL(blob);
 
-                    canvas.toBlob(
-                        blob => resolve(blob),
-                        "image/jpeg",
-                        q
-                    );
+      result.innerHTML = `
+        <div class="success">
+          <strong>変換成功</strong><br><br>
 
-                });
-            }
+          画像形式：JPG<br>
+          画像サイズ：600×730px<br>
+          ファイル容量：${formatBytes(blob.size)}<br>
 
+          <a
+            class="download"
+            href="${url}"
+            download="passport-photo.jpg"
+          >
+            写真を保存する
+          </a>
+        </div>
+      `;
 
-            async function compressToTarget() {
+      convertButton.disabled = false;
+      convertButton.textContent = "写真を調整する";
+    }
 
-                let blob = await makeBlob(quality);
+    function showError(message) {
+      result.innerHTML = `
+        <div class="error">
+          ${escapeHtml(message)}
+        </div>
+      `;
 
-                while (
-                    blob.size > MAX_BYTES &&
-                    quality > 0.1
-                ) {
+      convertButton.disabled = false;
+      convertButton.textContent = "写真を調整する";
+    }
 
-                    quality -= 0.05;
+    function formatBytes(bytes) {
+      if (bytes < 1024) {
+        return bytes + " B";
+      }
 
-                    blob = await makeBlob(quality);
-                }
+      if (bytes < 1024 * 1024) {
+        return (bytes / 1024).toFixed(1) + " KB";
+      }
 
-                return {
-                    blob: blob,
-                    quality: quality
-                };
-            }
+      return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    }
 
-
-            compressToTarget().then(data => {
-
-                const blob = data.blob;
-                const finalQuality = data.quality;
-
-                const url =
-                    URL.createObjectURL(blob);
-
-                const sizeKB =
-                    blob.size / 1024;
-
-                const passed =
-                    blob.size <= MAX_BYTES;
-
-                if (passed) {
-
-                    result.innerHTML = `
-                        <div class="check ok">
-
-                            <h2>変換完了 ✓</h2>
-
-                            <p>
-                            <strong>形式：</strong>JPG ✓
-                            </p>
-
-                            <p>
-                            <strong>サイズ：</strong>
-                            600 × 730 px ✓
-                            </p>
-
-                            <p>
-                            <strong>容量：</strong>
-                            ${sizeKB.toFixed(1)} KB ✓
-                            </p>
-
-                            <p>
-                            自動調整後の品質：
-                            ${Math.round(finalQuality * 100)}%
-                            </p>
-
-                            <p>
-                            <strong>
-                            ファイル条件はすべてクリアしています。
-                            </strong>
-                            </p>
-
-                            <a
-                                href="${url}"
-                                download="passport-photo.jpg"
-                            >
-                                <button>
-                                画像を保存
-                                </button>
-                            </a>
-
-                        </div>
-
-                        <img
-                            src="${url}"
-                            class="preview"
-                            alt="変換後の画像"
-                        >
-                    `;
-
-                } else {
-
-                    result.innerHTML = `
-                        <div class="check ng">
-
-                            <h2>600KB以下にできませんでした</h2>
-
-                            <p>
-                            現在の最低品質でも
-                            ${sizeKB.toFixed(1)} KBあります。
-                            </p>
-
-                            <p>
-                            別の写真を使用するか、
-                            元画像のサイズ・内容を見直してください。
-                            </p>
-
-                        </div>
-                    `;
-                }
-
-            });
-
-        };
-
-        img.src = e.target.result;
-    };
-
-    reader.readAsDataURL(file);
-});
-
-</script>
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
 
 </body>
 </html>
